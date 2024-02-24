@@ -5,10 +5,12 @@ import connectToDatabase from "./lib/mongoconnect";
 import rest from "./server/rest";
 import { Server } from "socket.io";
 import socketApi from "./server/socket";
+
 dotenv.config();
 
 try {
   connectToDatabase();
+
   const app = express();
   let io;
 

@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     default: Helpers.generateHexColorString,
   },
   courses: [{ type: String, ref: "Course" }],
+  registrationDate: { default: Date.now, type: Number },
 });
 
 const User = mongoose.model("User", userSchema);

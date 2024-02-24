@@ -24,7 +24,7 @@ const userHandlers = {
         firstName: firstName,
         lastName: lastName,
       });
-      user.save();
+      await user.save();
       res
         .status(StatusCodes.CREATED)
         .json({ message: "profile created successfuly" });
