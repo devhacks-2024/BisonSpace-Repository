@@ -12,8 +12,8 @@ def groups(page: ft.Page):
         return path
 
     def button_handler(_):
-        print(_.__dict__)
         page.clean()
+        page.client_storage.set("course_id", _.control.data)
         page.client_storage.set("course_name", _.control.text)
         group(page)
         page.update()
@@ -29,14 +29,16 @@ def groups(page: ft.Page):
             size=36
         )
         groups_grid = ft.GridView(
-            expand=100,
-            runs_count=20,
-            max_extent=400,
+            expand=50,
+            runs_count=30,
+            max_extent=430,
             child_aspect_ratio=1.0,
-            spacing=10,
+            spacing=20,
             run_spacing=10,
         )
+        print(reqs["courses"])
         for course in reqs["courses"]:
+            print(course["name"]["shortName"])
             try:
                 path = find_image(course["_id"])
             except FileNotFoundError:
@@ -57,13 +59,14 @@ def groups(page: ft.Page):
                                 alignment=ft.MainAxisAlignment.CENTER,
                             ),
                             ft.ListTile(
-                                title=ft.Text(f"Introductory computer science 1"),
+                                title=ft.Text(f"{course["name"]["officialName"]}"),
                                 subtitle=ft.Text(
                                     f"{course["name"]["description"]}"
                                 ),
                             ),
                             ft.ElevatedButton(
                                 f"{course["name"]["shortName"]}",
+                                data=f"{course["_id"]}",
                                 on_click=button_handler
                             )
                         ],
