@@ -13,6 +13,27 @@ const courseHandler = {
         .json({ message: "server error" });
     }
   },
+
+  async getAllUsersInCourse(req: Request, res: Response) {
+    try {
+      const { courseId } = req.params;
+
+      const course = await Course.findById(courseId).populate({
+        path: "users",
+        select: "_id firstName lastName",
+      });
+      if (!course)
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ message: "course not found" });
+      const usersInCourse = course.users;
+      res.status(StatusCodes.OK).json({ users: usersInCourse });
+    } catch (error) {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: "server error" });
+    }
+  },
 };
 
 export default courseHandler;
