@@ -42,15 +42,11 @@ const socketLib = {
   async getStudyRoomAssignment(groupId: string) {
     try {
       const studyRoom = await StudyRoom.findById(groupId).populate({
-        path: "messages",
-        populate: {
-          path: "sender",
-          select: "_id firstName lastName defaultProfileColor",
-        },
+        path: "assignment",
       });
-      if (!studyRoom) return [];
-      const messages = studyRoom.messages;
-      return messages;
+      if (!studyRoom) return {};
+      const assignment = studyRoom.assignment;
+      return assignment;
     } catch (error) {
       return [];
     }

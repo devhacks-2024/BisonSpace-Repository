@@ -4,6 +4,27 @@ import { StatusCodes } from "http-status-codes";
 import Course from "../models/courses";
 
 const studyRoomHandler = {
+  async getStudyRooms(req: any, res: Response) {
+    const { courseId } = req.body;
+    if (!courseId)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "all fields must be filled correctly" });
+    const course = await Course.findById(courseId).populate("studyRooms");
+    if (!course)
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "not found" });
+    const studyRooms = course.studyRooms;
+    res.status(StatusCodes.OK).json({ studyRooms });
+  },
+
+  async createAssignment(req: any, res: Response) {
+    const { name, language, shouldKeep, type } = req.body;
+    if (!(name && language && shouldKeep && type))
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "all fields must be filled correctly" });
+  },
+
   async createStudyRoom(req: any, res: Response) {
     try {
       let { type, users, name, courseId } = req.body;
