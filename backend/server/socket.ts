@@ -3,6 +3,7 @@ import authorization from "../middleware/socketAuthorization";
 import socketLib from "../lib/socketLib";
 
 const socketApi = (io: Server) => {
+  console.log("socket lib started");
   io.use(authorization);
   io.on("connection", (socket: any) => {
     console.log("user connected");
