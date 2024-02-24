@@ -31,6 +31,7 @@ const socketLib = {
     io: Server
   ) {
     try {
+    console.log(location,locationId, body)
       let foundLocation;
       if (location == "course") {
         foundLocation = await Course.findById(locationId);
