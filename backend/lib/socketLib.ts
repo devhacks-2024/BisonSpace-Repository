@@ -44,14 +44,14 @@ const socketLib = {
       const studyRoom = await StudyRoom.findById(groupId).populate({
         path: "assignment",
       });
-      if (!studyRoom) return {};
-      console.log(studyRoom);
-      const assignment = studyRoom.assignment;
-      console.log(assignment);
-      return assignment;
+      if (studyRoom) {
+        console.log(studyRoom);
+        const assignment = studyRoom.assignment;
+        console.log(assignment);
+        return assignment;
+      }
     } catch (error) {
       console.log(error);
-      return {};
     }
   },
 

@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import authorization from "../middleware/socketAuthorization";
 import socketLib from "../lib/socketLib";
+import Assignment from "../models/assignment";
 
 const socketApi = (io: Server) => {
   console.log("socket lib started");
@@ -52,13 +53,14 @@ const socketApi = (io: Server) => {
 
     socket.on("join_studyRoom", async (groupId: string) => {
       try {
-        socket.join(groupId);
-
         const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
           groupId
         );
+        if (studyRoomAssignment) {
+          socket.join(studyRoomAssignment._id);
+        }
 
-        socket.emit("studyRoomAssignment", studyRoomAssignment);
+        socket.emit("studyRoomAssignment", { studyRoomAssignment });
       } catch (error) {
         socket.emit("error", { message: "error leaving course" });
       }

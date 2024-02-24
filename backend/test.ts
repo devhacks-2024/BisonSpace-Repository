@@ -1,5 +1,8 @@
 // import Course from "./models/courses";
 // import User from "./models/users";
+// import StudyRoom from "./models/studyRooms";
+// import Assignment from "./models/assignment";
+// import Message from "./models/messages";
 
 // const courses = [
 //   {
@@ -101,7 +104,11 @@
 //   },
 // ];
 // const createCourses = async () => {
-//   //await Course.deleteMany();
+//   //   await Course.deleteMany();
+//   //   await User.deleteMany();
+//   //   await StudyRoom.deleteMany();
+//   //   await Message.deleteMany();
+//   //   await Assignment.deleteMany();
 //   const proc = courses.map(async (course) => {
 //     const _course = new Course({
 //       name: course.name,
