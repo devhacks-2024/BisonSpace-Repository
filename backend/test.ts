@@ -3,7 +3,6 @@
 
 // const courses = [
 //   {
-//     _id: "COMP 1000",
 //     name: {
 //       officialName: "Introductory Programming: Think Like a Computer  3 cr  ",
 //       shortName: "COMP 1000",
@@ -12,7 +11,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 1002",
 //     name: {
 //       officialName:
 //         "Introduction to Tools and Techniques in Computer Science 1  1.5 cr  ",
@@ -22,7 +20,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 1010",
 //     name: {
 //       officialName: "Introductory Computer Science 1  3 cr  ",
 //       shortName: "COMP 1010",
@@ -31,7 +28,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 1012",
 //     name: {
 //       officialName: "Computer Programming for Scientists and Engineers  3 cr",
 //       shortName: "COMP 1012",
@@ -40,7 +36,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 1020",
 //     name: {
 //       officialName: "Introductory Computer Science 2  3 cr  ",
 //       shortName: "COMP 1020",
@@ -49,7 +44,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 1500",
 //     name: {
 //       officialName: "Computing: Ideas and Innovation  3 cr  ",
 //       shortName: "COMP 1500",
@@ -58,7 +52,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 1600",
 //     name: {
 //       officialName: "Navigating Your Digital World  3 cr  ",
 //       shortName: "COMP 1600",
@@ -67,7 +60,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 2002",
 //     name: {
 //       officialName: "Tools and Techniques in Computer Science 1  1.5 cr   ",
 //       shortName: "COMP 2002",
@@ -76,7 +68,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 2006",
 //     name: {
 //       officialName: "ools and Techniques in Computer Science 2  1.5 cr  ",
 //       shortName: "COMP 2006",
@@ -85,7 +76,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 2060",
 //     name: {
 //       officialName: "COMP 2060  Special Topics in Computer Science  3 cr  ",
 //       shortName: "COMP 2060",
@@ -94,7 +84,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 2080",
 //     name: {
 //       officialName: "Analysis of Algorithms  3 cr  ",
 //       shortName: "COMP 2080",
@@ -103,7 +92,6 @@
 //     },
 //   },
 //   {
-//     _id: "COMP 2130",
 //     name: {
 //       officialName: "Discrete Mathematics for Computer Science  3 cr  ",
 //       shortName: "COMP 2130",
@@ -112,17 +100,16 @@
 //     },
 //   },
 // ];
-// // const createCourses = async () => {
+// const createCourses = async () => {
+//   //await Course.deleteMany();
+//   const proc = courses.map(async (course) => {
+//     const _course = new Course({
+//       name: course.name,
+//     });
+//     await _course.save();
+//   });
 
-// //   const proc = courses.map(async (course) => {
-// //     const _course = new Course({
-// //       _id: course._id,
-// //       name: course.name,
-// //     });
-// //     await _course.save();
-// //   });
+//   await Promise.all(proc);
+// };
 
-// //   await Promise.all(proc);
-// // };
-
-// // export default createCourses;
+// export default createCourses;
