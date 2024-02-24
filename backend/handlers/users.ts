@@ -27,9 +27,8 @@ const userHandlers = {
         lastName: lastName,
       });
       await user.save();
-      res
-        .status(StatusCodes.CREATED)
-        .json({ message: "profile created successfuly" });
+      const token = Helpers.generateUserToken({ email });
+      res.status(StatusCodes.CREATED).json({ token });
     } catch (error) {
       res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
