@@ -42,6 +42,7 @@ const userHandlers = {
         email: req.user._id,
         firstName: req.user.firstName,
         lastName: req.user.lastName,
+        defaultProfileColor: req.user.defaultProfileColor,
       };
       res.status(StatusCodes.OK).json({ user });
     } catch (error) {
