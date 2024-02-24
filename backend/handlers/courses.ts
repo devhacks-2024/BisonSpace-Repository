@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 const courseHandler = {
   async getCourses(req: Request, res: Response) {
     try {
-      const courses = await Course.find();
+      const courses = await Course.find().select({ name: 1, _id: 1 });
       res.status(StatusCodes.OK).json({ courses });
     } catch (error) {
       res
