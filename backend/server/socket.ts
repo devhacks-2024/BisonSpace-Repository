@@ -39,9 +39,11 @@ const socketApi = (io: Server) => {
       }
     );
 
-    socket.on("leaveCourse", async (courseId: string) => {
+    socket.on("leaveCourses", async (courseId: string) => {
       try {
-        await socket.leave(courseId);
+        for (let room of socket.rooms) {
+          await socket.leave(room);
+        }
       } catch {
         socket.emit("error", { message: "error leaving course" });
       }
