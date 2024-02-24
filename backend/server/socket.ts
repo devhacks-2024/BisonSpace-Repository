@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import authorization from "../middleware/socketAuthorization";
 import socketLib from "../lib/socketLib";
+import Assignment from "../models/assignment";
 
 const socketApi = (io: Server) => {
   console.log("socket lib started");
@@ -51,19 +52,22 @@ const socketApi = (io: Server) => {
     });
 
     socket.on("join_studyRoom", async (groupId: string) => {
-      try {
-        socket.join(groupId);
-        const previousStudyRoomMessages =
-          await socketLib.getPreviousGroupMessages(groupId);
-        const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
-          groupId
-        );
-        socket.emit("previousStudyRoomMessages", previousStudyRoomMessages);
-        socket.emit("studyRoomAssignment", studyRoomAssignment);
-      } catch (error) {
-        socket.emit("error", { message: "error leaving course" });
-      }
+      socket.emit("heelo", "hello world");
+      //   try {
+      //     const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
+      //       groupId
+      //     );
+      //     if (studyRoomAssignment) {
+      //       console.log(studyRoomAssignment);
+      //       socket.join(studyRoomAssignment._id.toString());
+      //       io.to(studyRoomAssignment._id.toString()).emit("hello world");
+      //     }
+      //   } catch (error) {
+      //     socket.emit("error", { message: "error leaving course" });
+      //   }
     });
+
+    //socket.on("change_assignment_text", async(assignmentID));
   });
 };
 

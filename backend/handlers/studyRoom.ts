@@ -20,20 +20,31 @@ const studyRoomHandler = {
 
   async createAssignment(req: any, res: Response) {
     try {
-      const { name, language, shouldKeep, type } = req.body;
-      if (!(name && language && shouldKeep && type))
+      const { name, language, shouldKeep, type, studyRoomId, description } =
+        req.body;
+
+      if (!(name && language && type && studyRoomId && description))
         return res
           .status(StatusCodes.BAD_REQUEST)
           .json({ message: "all fields must be filled correctly" });
 
-      const assignment = new Assignment({
+      const studyRoom = await StudyRoom.findById(studyRoomId);
+      let assignment = new Assignment({
         language,
         body: "",
         shouldKeep,
         type,
         name,
+        description,
       });
-      await assignment.save();
+
+      if (!studyRoom)
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ message: "study Room not found" });
+      assignment = await assignment.save();
+      studyRoom.assignment = assignment._id;
+      await studyRoom.save();
       res.status(StatusCodes.OK).json({ message: "assignment created" });
     } catch (error) {
       console.log(error);

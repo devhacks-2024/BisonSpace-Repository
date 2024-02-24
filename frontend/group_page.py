@@ -2,7 +2,7 @@ import flet as ft
 from assignment_page import assignment
 import requests
 from avatar_generator import generator
-from sockets import send_message,socket
+from sockets import send_message, socket
 
 
 def group(page: ft.Page):
@@ -27,7 +27,7 @@ def group(page: ft.Page):
         data = {
             "type": page.client_storage.get("room_type"),
             "users": selected_participants,
-            "name": "some test",
+            "name": room_name.value,
             "courseId": page.client_storage.get("course_id"),
         }
         room_request = requests.post(
@@ -35,6 +35,7 @@ def group(page: ft.Page):
             json=data,
             headers={"authorization": f"{page.client_storage.get('token')}"}
         )
+        page.client_storage.set("roomId", room_request.json()["studyRoomId"])
         if room_request.status_code == 201:
             page.close_dialog()
             creation_form.open = False
@@ -45,9 +46,9 @@ def group(page: ft.Page):
 
     def checkbox_handler(_):
         if _.data == "true":
-            selected_participants.append(_.control.label)
+            selected_participants.append(_.control.data)
         elif _.data == "false":
-            selected_participants.remove(_.control.label)
+            selected_participants.remove(_.control.data)
 
     def dropdown_handler(_):
         if _.data == "Private":
@@ -71,6 +72,7 @@ def group(page: ft.Page):
                             generated_list_avatar,
                             ft.CupertinoCheckbox(
                                 label=f"{participant["firstName"]} {participant["lastName"]}",
+                                data=f"{participant["_id"]}",
                                 on_change=checkbox_handler,
                             )
                         ]
@@ -102,6 +104,62 @@ def group(page: ft.Page):
     def close_dlg(e):
         page.close_dialog()
         creation_form.open = False
+        page.update()
+
+    def close_room(e):
+        page.close_dialog()
+        rooms_form.open = False
+        page.update()
+
+    study_rooms = requests.get(
+        url="http://127.0.0.1:4000/api/studyRoom",
+        json={
+            "courseId": page.client_storage.get("course_id"),
+        },
+        headers={"authorization": f"{page.client_storage.get('token')}"}
+    )
+    stusy_rooms_converted = study_rooms.json()
+    room_content = ft.Column(
+        [
+        ],
+        height=400,
+        width=600
+    )
+
+    def redirection_handler(_):
+        page.client_storage.set("roomId", _.control.text)
+        page.close_dialog()
+        rooms_form.open = False
+        page.controls.clear()
+        assignment(page)
+        page.update()
+
+    for room in stusy_rooms_converted["studyRooms"]:
+        room_content.controls.append(
+            ft.Row(
+                [
+                    ft.ElevatedButton(
+                        text=room["_id"],
+                        on_click=redirection_handler
+                    )
+                ]
+            )
+        )
+
+    rooms_form = (ft.AlertDialog(
+        on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        modal=True,
+        actions=[
+            ft.TextButton("Cancel", on_click=close_room),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+        title=ft.Text("Current study rooms"),
+        content=room_content
+    ))
+
+    def room_assign_handler(_):
+        page.dialog = rooms_form
+        rooms_form.open = True
         page.update()
 
     def room_handler(_):
@@ -163,41 +221,91 @@ def group(page: ft.Page):
     def assignment_button_handler(_):
         try:
             if assignment_dropdown.value == "Python":
-                fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.py', 'x')
-                fp.close()
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.controls.clear()
-                assignment(page)
-                page.update()
+                assignment_request = requests.post(
+                    url="http://127.0.0.1:4000/api/studyRoom/assignment",
+                    json={
+                        "name": assignment_name.value,
+                        "language": assignment_dropdown.value,
+                        "shouldKeep": False,
+                        "studyRoomId": page.client_storage.get("roomId"),
+                        "type": "programming",
+                        "description": assignment_description.value
+                    },
+                    headers={"authorization": f"{page.client_storage.get('token')}"}
+                )
+                if assignment_request.status_code == 200:
+                    page.controls.clear()
+                    assignment(page)
+                    page.update()
             elif assignment_dropdown.value == "Java":
                 fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.java', 'x')
                 fp.close()
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.controls.clear()
-                assignment(page)
-                page.update()
+                assignment_request = requests.post(
+                    url="http://127.0.0.1:4000/api/studyRoom/assignment",
+                    json={
+                        "name": assignment_name.value,
+                        "language": assignment_dropdown.value,
+                        "shouldKeep": False,
+                        "studyRoomId": page.client_storage.get("roomId"),
+                        "type": "programming",
+                        "description": assignment_description.value
+                    },
+                    headers={"authorization": f"{page.client_storage.get('token')}"}
+                )
+                if assignment_request.status_code == 200:
+                    page.controls.clear()
+                    assignment(page)
+                    page.update()
             elif assignment_dropdown.value == "Plain text":
                 fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.txt', 'x')
                 fp.close()
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.controls.clear()
-                assignment(page)
-                page.update()
+                assignment_request = requests.post(
+                    url="http://127.0.0.1:4000/api/studyRoom/assignment",
+                    json={
+                        "name": assignment_name.value,
+                        "language": assignment_dropdown.value,
+                        "shouldKeep": False,
+                        "studyRoomId": page.client_storage.get("roomId"),
+                        "type": "programming",
+                        "description": assignment_description.value
+                    },
+                    headers={"authorization": f"{page.client_storage.get('token')}"}
+                )
+                if assignment_request.status_code == 200:
+                    page.controls.clear()
+                    assignment(page)
+                    page.update()
             else:
                 fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.txt', 'x')
                 fp.close()
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.controls.clear()
-                assignment(page)
-                page.update()
+                assignment_request = requests.post(
+                    url="http://127.0.0.1:4000/api/studyRoom/assignment",
+                    json={
+                        "name": assignment_name.value,
+                        "language": assignment_dropdown.value,
+                        "shouldKeep": False,
+                        "studyRoomId": page.client_storage.get("roomId"),
+                        "type": "programming",
+                        "description": assignment_description.value
+                    },
+                    headers={"authorization": f"{page.client_storage.get('token')}"}
+                )
+                if assignment_request.status_code == 200:
+                    page.controls.clear()
+                    assignment(page)
+                    page.update()
         except FileExistsError:
             page.dialog = cupertino_alert_dialog
             cupertino_alert_dialog.open = True
@@ -274,6 +382,18 @@ def group(page: ft.Page):
                     width=240,
                     height=40,
                     icon=ft.icons.HISTORY,
+                    text="Current study rooms",
+                    style=ft.ButtonStyle(
+                        bgcolor=ft.colors.BLACK45,
+                    ),
+                    on_click=room_assign_handler
+                )
+            ),
+            ft.PopupMenuItem(
+                content=ft.ElevatedButton(
+                    width=240,
+                    height=40,
+                    icon=ft.icons.HISTORY,
                     text="Assignments history",
                     style=ft.ButtonStyle(
                         bgcolor=ft.colors.BLACK45,
@@ -315,63 +435,54 @@ def group(page: ft.Page):
         border_radius=25
     )
 
-    page.add(
-        ft.Column(
-            [ft.Row(
-                [
-                    title,
-                ]
-            ),
-                ft.Row(
-                    [
-                        chat,
-                    ],
-                ),
-                ft.Row(
-                    [
-                        new_message, study_room_button,
-                    ]
-                )],
-            width=1600
-        ),
-    )
-
     while True:
         events = socket.receive()
-        print(events)
         if events[0] == "newMessage":
-            message = events[1]
-            chat.controls.append(
-                ft.Container(
-                    ft.Row([generated_chat_avatar, ft.Text(
-                        f"{message["sender"]["_id"]}: {message["body"]}",
-                        size=20,
-                    ), ]),
-                    padding=15,
-                    border_radius=20,
-                    bgcolor=ft.colors.BLUE_GREY,
-                    expand=False,
-                    width=100,
+            page.clean()
+            messages = events[1]
+            page.add(
+                ft.Column(
+                    [ft.Row(
+                        [
+                            title,
+                        ]
+                    ),
+
+                    ]
                 )
             )
+            for message in messages:
+                page.add(ft.Row([generated_chat_avatar, ft.Text(
+                    f"{message["sender"]["_id"]}: {message["body"]}",
+                    size=20,
+                ), ]))
+
+            page.add(ft.Row(
+                [new_message, study_room_button]
+            ))
+
         elif events[0] == "previousCourseMessages":
-            chat.controls = []
+            page.clean()
             previousMessages = events[1]
-            print(previousMessages)
-            for message in previousMessages:
-                chat.controls.append(
-                    ft.Container(
-                        ft.Row([generated_chat_avatar, ft.Text(
-                            f"{message["sender"]["_id"]}: {message["body"]}",
-                            size=20,
-                        ), ]),
-                        padding=15,
-                        border_radius=20,
-                        bgcolor=ft.colors.BLUE_GREY,
-                        expand=False,
-                        width=100,
-                    )
+            page.add(
+                ft.Column(
+                    [ft.Row(
+                        [
+                            title,
+                        ]
+                    ),
+
+                    ]
                 )
-                page.update()
-        print(chat.controls)
+            )
+            for message in previousMessages:
+                page.add(ft.Row([generated_chat_avatar, ft.Text(
+                    f"{message["sender"]["_id"]}: {message["body"]}",
+                    size=20,
+                ), ]))
+
+            page.add(ft.Row(
+                [new_message, study_room_button]
+            ))
+
         page.update()
