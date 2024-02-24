@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../models/users";
+import { Socket } from "socket.io";
 
 interface RequestObject extends Request {
   user: UserInterface;
@@ -15,4 +16,8 @@ interface UserInterface {
   registrationDate: number;
 }
 
-export { RequestObject };
+interface SocketInterface extends Socket {
+  userId: string;
+}
+
+export { RequestObject, SocketInterface };
