@@ -86,6 +86,3 @@ def courses_pick(page: ft.Page) -> any:
         alignment=ft.MainAxisAlignment.CENTER,
         vertical_alignment=ft.CrossAxisAlignment.CENTER,
     ))
-
-
-ft.app(target=courses_pick)
