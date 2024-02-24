@@ -27,7 +27,14 @@ const socketApi = (io: Server) => {
         locationId: string;
         body: string;
       }) => {
-        await socketLib.sendMessage(location, locationId, socket.userId, body);
+        await socketLib.sendMessage(
+          location,
+          locationId,
+          socket.userId,
+          body,
+          socket,
+          io
+        );
       }
     );
   });
