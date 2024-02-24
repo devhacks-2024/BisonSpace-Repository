@@ -38,6 +38,14 @@ const socketApi = (io: Server) => {
         );
       }
     );
+
+    socket.on("leaveCourse", async (courseId: string) => {
+      try {
+        await socket.leave(courseId);
+      } catch {
+        socket.emit("error", { message: "error leaving course" });
+      }
+    });
   });
 };
 
