@@ -35,16 +35,21 @@ const userHandlers = {
         .json({ message: "Server Error" });
     }
   },
-  //   async getUser(req:Request, res:Response){
-  //     try{
-  //         const {user} = req.query
-  //     }
-  //     catch(error){
-  //         res
-  //         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-  //         .json({ message: "Server Error" });
-  //     }
-  //   }
+  async getSelf(req: any, res: Response) {
+    try {
+      const user = {
+        _id: req.user._id,
+        email: req.user._id,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      };
+      res.status(StatusCodes.OK).json({ user });
+    } catch (error) {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: "Server Error" });
+    }
+  },
 
   async addCourses(req: any, res: Response) {
     try {
