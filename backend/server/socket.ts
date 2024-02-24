@@ -16,7 +16,20 @@ const socketApi = (io: Server) => {
       socket.join(courseId);
     });
 
-    //socket.on("sendMessage", async({location,}))
+    socket.on(
+      "sendMessage",
+      async ({
+        location,
+        locationId,
+        body,
+      }: {
+        location: string;
+        locationId: string;
+        body: string;
+      }) => {
+        await socketLib.sendMessage(location, locationId, socket.userId, body);
+      }
+    );
   });
 };
 
