@@ -47,6 +47,7 @@ const studyRoomHandler = {
         course: courseId,
         users,
         type,
+        name,
       });
       room = await room.save();
       course.studyRooms.push(room._id);
