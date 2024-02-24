@@ -12,7 +12,7 @@ const authorization = async (
     try {
       token = token.replace("Bearer", "").trim();
       const payload: any = jwt.verify(token, key);
-      const user = await User.findById(payload._id);
+      const user = await User.findById(payload.email);
       if (user) {
         socket.userId = user._id;
         next();
