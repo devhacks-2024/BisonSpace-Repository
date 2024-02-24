@@ -10,6 +10,7 @@ const authorization = async (
   const key = process.env.KEY;
   if (token && typeof key == "string") {
     try {
+    console.log(token)
       token = token.replace("Bearer", "").trim();
       const payload: any = jwt.verify(token, key);
       const user = await User.findById(payload.email);
