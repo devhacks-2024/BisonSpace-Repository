@@ -12,8 +12,9 @@ def groups(page: ft.Page):
         return path
 
     def button_handler(_):
+        print(_.__dict__)
         page.clean()
-        page.client_storage.set("course_name", _.control.data)
+        page.client_storage.set("course_name", _.control.text)
         group(page)
         page.update()
 
@@ -56,14 +57,13 @@ def groups(page: ft.Page):
                                 alignment=ft.MainAxisAlignment.CENTER,
                             ),
                             ft.ListTile(
-                                title=ft.Text(f"Introductory computer science 1 - [{course["name"]["shortName"]}]"),
+                                title=ft.Text(f"Introductory computer science 1"),
                                 subtitle=ft.Text(
                                     f"{course["name"]["description"]}"
                                 ),
                             ),
                             ft.ElevatedButton(
-                                f"Go into",
-                                data=course["name"]["shortName"],
+                                f"{course["name"]["shortName"]}",
                                 on_click=button_handler
                             )
                         ],
