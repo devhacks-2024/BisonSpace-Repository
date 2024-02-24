@@ -1,13 +1,15 @@
 import flet as ft
+from groups_page import groups
 
 
 def content(page: ft.Page) -> any:
     page.title = "Content"
+    groups(page)
 
     def tab_handler(tab):
         if tab.data == "0":
             page.clean()
-            pass
+            groups(page)
             page.update()
         elif tab.data == "1":
             page.clean()

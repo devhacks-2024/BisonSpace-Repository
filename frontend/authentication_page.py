@@ -1,5 +1,5 @@
 import flet as ft
-
+import requests
 from content_page import content
 from courses_pick_page import courses_pick
 
@@ -28,9 +28,22 @@ def login(page: ft.Page) -> any:
             elif not password.value:
                 password.error_text = "Password cant be empty"
                 password.update()
-            else:  # login request
-                page.clean()
-                content(page)
+            else:
+                data = {
+                    "email": email.value,
+                    "password": password.value
+                }
+                login_request = requests.post(
+                    url="http://127.0.0.1:4000/api/auth",
+                    json=data
+                )
+                if login_request.status_code == 200:
+                    page.clean()
+                    content(page)
+                else:
+                    page.dialog = cupertino_alert_dialog
+                    cupertino_alert_dialog.open = True
+                    page.update()
 
         form_fields = []
 
@@ -92,6 +105,29 @@ def login(page: ft.Page) -> any:
             alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
         ))
+
+        def remove_dialog(_):
+            cupertino_alert_dialog.open = False
+            email.value = None
+            password.value = None
+            page.update()
+
+        cupertino_alert_dialog = ft.CupertinoAlertDialog(
+            title=ft.Text("Invalid data"),
+            content=ft.Text("Enter you data again."),
+            actions=[
+                ft.CupertinoDialogAction(
+                    "OK",
+                    is_destructive_action=True,
+                    on_click=remove_dialog
+                ),
+                ft.CupertinoDialogAction(
+                    text="Cancel",
+                    on_click=remove_dialog
+                ),
+            ]
+        )
+
         return form_container
 
     def registration_form_setup() -> any:
@@ -109,8 +145,24 @@ def login(page: ft.Page) -> any:
                 password.error_text = "Password cant be empty"
                 password.update()
             else:  # register request
-                page.clean()
-                courses_pick(page)
+                data = {
+                    "firstName": first_name.value,
+                    "lastName": last_name.value,
+                    "email": email.value,
+                    "password": password.value
+                }
+                registration_request = requests.post(
+                    url="http://127.0.0.1:4000/api/users",
+                    json=data
+                )
+                if registration_request.status_code == 201:
+                    page.clean()
+                    courses_pick(page)
+                    page.update()
+                else:
+                    page.dialog = cupertino_alert_dialog
+                    cupertino_alert_dialog.open = True
+                    page.update()
 
         form_fields = []
 
@@ -185,6 +237,29 @@ def login(page: ft.Page) -> any:
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
+
+        def remove_dialog(_):
+            cupertino_alert_dialog.open = False
+            email.value = None
+            password.value = None
+            page.update()
+
+        cupertino_alert_dialog = ft.CupertinoAlertDialog(
+            title=ft.Text("Invalid data"),
+            content=ft.Text("Enter you data again."),
+            actions=[
+                ft.CupertinoDialogAction(
+                    "OK",
+                    is_destructive_action=True,
+                    on_click=remove_dialog
+                ),
+                ft.CupertinoDialogAction(
+                    text="Cancel",
+                    on_click=remove_dialog
+                ),
+            ]
+        )
+
         page.add(ft.Row(
             [form_container, ],
             alignment=ft.MainAxisAlignment.CENTER,
