@@ -22,6 +22,40 @@ const socketLib = {
     return messages;
   },
 
+  async getPreviousGroupMessages(groupId: string) {
+    try {
+      const studyRoom = await StudyRoom.findById(groupId).populate({
+        path: "messages",
+        populate: {
+          path: "sender",
+          select: "_id firstName lastName defaultProfileColor",
+        },
+      });
+      if (!studyRoom) return [];
+      const messages = studyRoom.messages;
+      return messages;
+    } catch (error) {
+      return [];
+    }
+  },
+
+  async getStudyRoomAssignment(groupId: string) {
+    try {
+      const studyRoom = await StudyRoom.findById(groupId).populate({
+        path: "messages",
+        populate: {
+          path: "sender",
+          select: "_id firstName lastName defaultProfileColor",
+        },
+      });
+      if (!studyRoom) return [];
+      const messages = studyRoom.messages;
+      return messages;
+    } catch (error) {
+      return [];
+    }
+  },
+
   async sendMessage(
     location: string,
     locationId: string,
@@ -50,11 +84,14 @@ const socketLib = {
         message = await message.save();
         foundLocation.messages.push(message._id);
         await foundLocation.save();
-        message = await message.populate({
-          path: "sender",
-          select: "_id , firstName, lastName, defaultProfileColor ",
+        const course = await Course.findById(locationId).populate({
+          path: "messages",
+          populate: {
+            path: "sender",
+            select: "_id firstName lastName defaultProfileColor",
+          },
         });
-        io.to(locationId).emit("newMessage", message);
+        io.to(locationId).emit("newMessage", course?.messages);
         if (!foundLocation.users.includes(userId)) {
           socket.emit("error", {
             message: "you do not belong in this location",

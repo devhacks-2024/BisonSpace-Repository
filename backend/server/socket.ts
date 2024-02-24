@@ -42,9 +42,25 @@ const socketApi = (io: Server) => {
     socket.on("leaveCourses", async (courseId: string) => {
       try {
         for (let room of socket.rooms) {
+          console.log(room);
           await socket.leave(room);
         }
       } catch {
+        socket.emit("error", { message: "error leaving course" });
+      }
+    });
+
+    socket.on("join_studyRoom", async (groupId: string) => {
+      try {
+        socket.join(groupId);
+        const previousStudyRoomMessages =
+          await socketLib.getPreviousGroupMessages(groupId);
+        const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
+          groupId
+        );
+        socket.emit("previousStudyRoomMessages", previousStudyRoomMessages);
+        socket.emit("studyRoomAssignment", studyRoomAssignment);
+      } catch (error) {
         socket.emit("error", { message: "error leaving course" });
       }
     });
