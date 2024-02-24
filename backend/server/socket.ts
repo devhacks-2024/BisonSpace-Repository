@@ -52,18 +52,19 @@ const socketApi = (io: Server) => {
     });
 
     socket.on("join_studyRoom", async (groupId: string) => {
-      try {
-        const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
-          groupId
-        );
-        if (studyRoomAssignment) {
-          console.log(studyRoomAssignment);
-          socket.join(studyRoomAssignment._id.toString());
-          io.to(studyRoomAssignment._id.toString()).emit("hello world");
-        }
-      } catch (error) {
-        socket.emit("error", { message: "error leaving course" });
-      }
+      socket.emit("heelo", "hello world");
+      //   try {
+      //     const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
+      //       groupId
+      //     );
+      //     if (studyRoomAssignment) {
+      //       console.log(studyRoomAssignment);
+      //       socket.join(studyRoomAssignment._id.toString());
+      //       io.to(studyRoomAssignment._id.toString()).emit("hello world");
+      //     }
+      //   } catch (error) {
+      //     socket.emit("error", { message: "error leaving course" });
+      //   }
     });
 
     //socket.on("change_assignment_text", async(assignmentID));
