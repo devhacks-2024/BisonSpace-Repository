@@ -5,11 +5,13 @@ import connectToDatabase from "./lib/mongoconnect";
 import rest from "./server/rest";
 import { Server } from "socket.io";
 import socketApi from "./server/socket";
+// import createCourses from "./test";
 
 dotenv.config();
 
 try {
   connectToDatabase();
+  // createCourses();
 
   const app = express();
   let io;

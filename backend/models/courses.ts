@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const courseSchema = new mongoose.Schema({
+  _id: String,
   name: {
     officialName: String,
     shortName: String,
@@ -11,7 +12,6 @@ const courseSchema = new mongoose.Schema({
   studyRooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "StudyRoom" }],
   users: [{ type: String, ref: "User" }],
   history: [{ type: mongoose.Schema.Types.ObjectId, ref: "Assignment" }],
-  admin: String,
 });
 
 const Course = mongoose.model("Course", courseSchema);
