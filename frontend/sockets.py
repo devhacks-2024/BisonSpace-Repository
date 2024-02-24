@@ -11,6 +11,8 @@ def joinCourse(courseId):
     socket.emit("join_course", courseId)
 
 
+
+
 def send_message( location, locationId, body):
     socket.emit("sendMessage",
                      {

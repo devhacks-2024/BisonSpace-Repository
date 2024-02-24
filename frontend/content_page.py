@@ -2,6 +2,7 @@ import flet as ft
 from groups_page import groups
 import requests
 from sockets import connect
+from profile_page import profile
 
 
 def content(page: ft.Page) -> any:
@@ -28,7 +29,7 @@ def content(page: ft.Page) -> any:
             page.update()
         elif tab.data == "1":
             page.clean()
-            pass
+            profile(page)
             page.update()
 
     page.navigation_bar = ft.NavigationBar(
