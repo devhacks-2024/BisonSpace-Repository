@@ -1,6 +1,7 @@
 import flet as ft
-
+import requests
 from content_page import content
+from pathlib import Path
 
 
 def courses_pick(page: ft.Page) -> any:
@@ -8,14 +9,24 @@ def courses_pick(page: ft.Page) -> any:
     page.padding = 50
     page.scroll = ft.ScrollMode.ADAPTIVE
     choosen_courses = []
-    courses_list = ["comp 1010", "comp 1020", "comp 2020", "comp 1010", "comp 1020", "comp 2020", "comp 1010",
-                    "comp 1020", "comp 2020", "comp 1010", "comp 1020", "comp 1010", "comp 1020", "comp 1010",
-                    "comp 1020", "comp 2020", "comp 1010", "comp 1020", "comp 2020", "comp 1010",
-                    "comp 1020", "comp 2020", "comp 1010", "comp 1020", "comp 1010", "comp 1020", ]
 
-    def courses_handler(_):
-        page.clean()
-        content(page)
+    def find_image(group_name: str):
+        path = Path(__file__).parent / f"./pictures/{group_name}.png"
+        return path
+
+    def continue_handler(_):
+        data = {
+            "courses": choosen_courses
+        }
+        continue_request = requests.post(
+            "http://127.0.0.1:4000/api/users/addCourses",
+            json=data,
+            headers={"authorization": f"{page.client_storage.get('token')}"}
+        )
+        if continue_request.status_code == 200:
+            page.clean()
+            content(page)
+            page.update()
 
     def checkbox_handler(_):
         if _.data == "true":
@@ -24,6 +35,9 @@ def courses_pick(page: ft.Page) -> any:
             choosen_courses.remove(_.control.label)
 
     def grid_setup() -> ft.Column:
+        courses_requests = requests.get("http://127.0.0.1:4000/api/courses")
+        courses_json = courses_requests.json()
+
         title = ft.Text(
             value="Choose your current term courses",
             size=36,
@@ -36,30 +50,45 @@ def courses_pick(page: ft.Page) -> any:
             style=ft.ButtonStyle(
                 bgcolor=ft.colors.BLACK45,
             ),
-            on_click=courses_handler
+            on_click=continue_handler
         )
         courses_grid = ft.GridView(
-            expand=50,
-            runs_count=20,
-            max_extent=250,
-            child_aspect_ratio=1.0,
+            expand=150,
+            runs_count=5,
+            max_extent=400,
+            child_aspect_ratio=0.9,
             spacing=10,
-            run_spacing=50,
+            run_spacing=10,
         )
-        for course in courses_list:  # change to course from db
+
+        for course in courses_json["courses"]:
+            try:
+                path = find_image(course["_id"])
+            except FileNotFoundError:
+                path = ""
             course_card = ft.Card(
                 content=ft.Container(
                     content=ft.Column(
                         [
+                            ft.Row(
+                                [
+                                    ft.Image(
+                                        src=path,
+                                    ),
+                                ],
+                                width=250,
+                                height=80,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            ),
                             ft.ListTile(
-                                leading=ft.Icon(ft.icons.ALBUM),
-                                title=ft.Text("Introductory computer science 1"),
+                                title=ft.Text(f"{course["name"]["officialName"]}"),
                                 subtitle=ft.Text(
-                                    "Programming coursrogramming course..rogramming course..rogramming course..e.."
+                                    f"{course["name"]["description"][0:80]}..."
                                 ),
                             ),
                             ft.CupertinoCheckbox(
-                                label=f"{course}",
+                                label=f"{course["_id"]}",
                                 on_change=checkbox_handler
                             )
                         ],
@@ -77,6 +106,7 @@ def courses_pick(page: ft.Page) -> any:
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
+
         return form_container
 
     page.add(ft.Row(

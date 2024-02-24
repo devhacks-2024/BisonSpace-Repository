@@ -144,7 +144,7 @@ backend/.env
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
+frontend/pictures/*.
 # Pyre type checker
 .pyre/
 

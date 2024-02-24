@@ -2,9 +2,10 @@ import flet as ft
 import requests
 from content_page import content
 from courses_pick_page import courses_pick
+import json
 
 
-def login(page: ft.Page) -> any:
+def authentication(page: ft.Page) -> any:
     page.title = "Autnentication"
     page.window_maximized = True
     page.window_resizable = False
@@ -38,7 +39,9 @@ def login(page: ft.Page) -> any:
                     json=data
                 )
                 if login_request.status_code == 200:
+                    token = json.loads(login_request.text)
                     page.clean()
+                    page.client_storage.set("token", token["token"])
                     content(page)
                 else:
                     page.dialog = cupertino_alert_dialog
@@ -144,7 +147,7 @@ def login(page: ft.Page) -> any:
             elif not password.value:
                 password.error_text = "Password cant be empty"
                 password.update()
-            else:  # register request
+            else:
                 data = {
                     "firstName": first_name.value,
                     "lastName": last_name.value,
@@ -156,7 +159,9 @@ def login(page: ft.Page) -> any:
                     json=data
                 )
                 if registration_request.status_code == 201:
+                    token = json.loads(registration_request.text)
                     page.clean()
+                    page.client_storage.set("token", token["token"])
                     courses_pick(page)
                     page.update()
                 else:
@@ -273,4 +278,4 @@ def login(page: ft.Page) -> any:
     ))
 
 
-ft.app(target=login, )
+ft.app(target=authentication, )
