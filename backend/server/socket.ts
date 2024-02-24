@@ -59,7 +59,7 @@ const socketApi = (io: Server) => {
         if (studyRoomAssignment) {
           console.log(studyRoomAssignment);
           socket.join(studyRoomAssignment._id.toString());
-          io.to(studyRoomAssignment._id.toString()).emit(studyRoomAssignment);
+          io.to(studyRoomAssignment._id.toString()).emit("hello world");
         }
       } catch (error) {
         socket.emit("error", { message: "error leaving course" });
