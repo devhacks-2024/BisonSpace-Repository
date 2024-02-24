@@ -16,7 +16,12 @@ const socketLib = {
     return messages;
   },
 
-  async sendMessage(location:string, locationId:string, userId:string, body:string)
+  async sendMessage(
+    location: string,
+    locationId: string,
+    userId: string,
+    body: string
+  ) {},
 };
 
 export default socketLib;
