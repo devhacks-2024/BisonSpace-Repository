@@ -7,7 +7,7 @@ const studyRoomHandler = {
   async createStudyRoom(req: any, res: Response) {
     try {
       let { type, users, name, courseId } = req.body;
-      console.log(type, users, name, courseId);
+
       if (!(type && users && name && courseId))
         return res
           .status(StatusCodes.BAD_REQUEST)
@@ -17,8 +17,31 @@ const studyRoomHandler = {
         return res
           .status(StatusCodes.NOT_FOUND)
           .json({ message: "course not found" });
+      if (!course.users.includes(req.user._id)) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "you do not belong in this course" });
+      }
 
       if (type == "public") users = course.users;
+      if (type == "private") {
+        let allUsersBelongToCourse = true;
+        if (users.length == 0) {
+          return res
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ message: "you have to add users to study group" });
+        }
+
+        users.forEach((user: string) => {
+          if (!course.users.includes(user)) allUsersBelongToCourse = false;
+        });
+        if (!allUsersBelongToCourse)
+          return res
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ message: "all users added must belong to course" });
+
+        users.push(req.user._id);
+      }
 
       let room = new StudyRoom({
         course: courseId,
