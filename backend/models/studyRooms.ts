@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const studyRoomSchema = new mongoose.Schema({
+  name: String,
   assignment: { type: mongoose.Schema.ObjectId, ref: "Assignment" },
   course: { type: mongoose.Schema.ObjectId, ref: "Course" },
   created: { default: Date.now, type: Number },

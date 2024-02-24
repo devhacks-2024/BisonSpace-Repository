@@ -2,6 +2,7 @@ import StudyRoom from "../models/studyRooms";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Course from "../models/courses";
+import Assignment from "../models/assignment";
 
 const studyRoomHandler = {
   async getStudyRooms(req: any, res: Response) {
@@ -18,11 +19,28 @@ const studyRoomHandler = {
   },
 
   async createAssignment(req: any, res: Response) {
-    const { name, language, shouldKeep, type } = req.body;
-    if (!(name && language && shouldKeep && type))
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "all fields must be filled correctly" });
+    try {
+      const { name, language, shouldKeep, type } = req.body;
+      if (!(name && language && shouldKeep && type))
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ message: "all fields must be filled correctly" });
+
+      const assignment = new Assignment({
+        language,
+        body: "",
+        shouldKeep,
+        type,
+        name,
+      });
+      await assignment.save();
+      res.status(StatusCodes.OK).json({ message: "assignment created" });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: "Server Error" });
+    }
   },
 
   async createStudyRoom(req: any, res: Response) {
