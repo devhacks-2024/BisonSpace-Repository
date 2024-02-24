@@ -57,16 +57,16 @@ const socketApi = (io: Server) => {
           groupId
         );
         if (studyRoomAssignment) {
-          socket.join(studyRoomAssignment._id);
+          console.log(studyRoomAssignment);
+          socket.join(studyRoomAssignment._id.toString());
+          io.to(studyRoomAssignment._id.toString()).emit(studyRoomAssignment);
         }
-
-        socket.emit("studyRoomAssignment", { studyRoomAssignment });
       } catch (error) {
         socket.emit("error", { message: "error leaving course" });
       }
     });
 
-    // socket.on("change_assignment_text", async (assignmentID ))
+    //socket.on("change_assignment_text", async(assignmentID));
   });
 };
 

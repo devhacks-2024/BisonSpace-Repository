@@ -41,7 +41,9 @@ const socketLib = {
 
   async getStudyRoomAssignment(groupId: string) {
     try {
-      const studyRoom = await StudyRoom.findById(groupId).populate({
+      const studyRoom = await StudyRoom.findById(groupId).populate<{
+        assignment: any;
+      }>({
         path: "assignment",
       });
       if (studyRoom) {
