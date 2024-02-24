@@ -22,22 +22,22 @@ const socketLib = {
     return messages;
   },
 
-  async getPreviousGroupMessages(groupId: string) {
-    try {
-      const studyRoom = await StudyRoom.findById(groupId).populate({
-        path: "messages",
-        populate: {
-          path: "sender",
-          select: "_id firstName lastName defaultProfileColor",
-        },
-      });
-      if (!studyRoom) return [];
-      const messages = studyRoom.messages;
-      return messages;
-    } catch (error) {
-      return [];
-    }
-  },
+  //   async getPreviousGroupMessages(groupId: string) {
+  //     try {
+  //       const studyRoom = await StudyRoom.findById(groupId).populate({
+  //         path: "messages",
+  //         populate: {
+  //           path: "sender",
+  //           select: "_id firstName lastName defaultProfileColor",
+  //         },
+  //       });
+  //       if (!studyRoom) return [];
+  //       const messages = studyRoom.messages;
+  //       return messages;
+  //     } catch (error) {
+  //       return [];
+  //     }
+  //   },
 
   async getStudyRoomAssignment(groupId: string) {
     try {
@@ -46,9 +46,11 @@ const socketLib = {
       });
       if (!studyRoom) return {};
       const assignment = studyRoom.assignment;
+      console.log(assignment);
       return assignment;
     } catch (error) {
-      return [];
+      console.log(error);
+      return {};
     }
   },
 

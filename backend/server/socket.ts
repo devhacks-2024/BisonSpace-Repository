@@ -53,17 +53,18 @@ const socketApi = (io: Server) => {
     socket.on("join_studyRoom", async (groupId: string) => {
       try {
         socket.join(groupId);
-        const previousStudyRoomMessages =
-          await socketLib.getPreviousGroupMessages(groupId);
+
         const studyRoomAssignment = await socketLib.getStudyRoomAssignment(
           groupId
         );
-        socket.emit("previousStudyRoomMessages", previousStudyRoomMessages);
+
         socket.emit("studyRoomAssignment", studyRoomAssignment);
       } catch (error) {
         socket.emit("error", { message: "error leaving course" });
       }
     });
+
+    // socket.on("change_assignment_text", async (assignmentID ))
   });
 };
 

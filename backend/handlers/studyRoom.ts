@@ -18,13 +18,12 @@ const studyRoomHandler = {
     res.status(StatusCodes.OK).json({ studyRooms });
   },
 
-  async getAssignment(req: any, res: Response) {},
-
   async createAssignment(req: any, res: Response) {
     try {
-      const { name, language, shouldKeep, type, studyRoomId } = req.body;
-      console.log(name, language, shouldKeep, type, studyRoomId);
-      if (!(name && language && type && studyRoomId))
+      const { name, language, shouldKeep, type, studyRoomId, description } =
+        req.body;
+
+      if (!(name && language && type && studyRoomId && description))
         return res
           .status(StatusCodes.BAD_REQUEST)
           .json({ message: "all fields must be filled correctly" });
@@ -36,6 +35,7 @@ const studyRoomHandler = {
         shouldKeep,
         type,
         name,
+        description,
       });
 
       if (!studyRoom)
