@@ -6,6 +6,7 @@ const assignmentSchema = new mongoose.Schema({
   body: String,
   language: { type: String },
   shouldKeep: { type: Boolean, default: false },
+  name: String,
 });
 
 const Assignment = mongoose.model("Assignment", assignmentSchema);
