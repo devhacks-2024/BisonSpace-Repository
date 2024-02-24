@@ -2,6 +2,7 @@ import flet as ft
 from group_page import group
 import requests
 from pathlib import Path
+from sockets import joinCourse,socket
 
 
 def groups(page: ft.Page):
@@ -15,6 +16,8 @@ def groups(page: ft.Page):
         page.clean()
         page.client_storage.set("course_id", _.control.data)
         page.client_storage.set("course_name", _.control.text)
+        socket.emit("leaveCourses","hello")
+        joinCourse(courseId=_.control.data)
         group(page)
         page.update()
 
@@ -29,16 +32,14 @@ def groups(page: ft.Page):
             size=36
         )
         groups_grid = ft.GridView(
-            expand=50,
+            expand=10,
             runs_count=30,
             max_extent=430,
             child_aspect_ratio=1.0,
             spacing=20,
             run_spacing=10,
         )
-        print(reqs["courses"])
         for course in reqs["courses"]:
-            print(course["name"]["shortName"])
             try:
                 path = find_image(course["_id"])
             except FileNotFoundError:

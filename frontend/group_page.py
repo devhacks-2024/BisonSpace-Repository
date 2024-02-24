@@ -2,6 +2,7 @@ import flet as ft
 from assignment_page import assignment
 import requests
 from avatar_generator import generator
+from sockets import send_message,socket
 
 
 def group(page: ft.Page):
@@ -56,12 +57,25 @@ def group(page: ft.Page):
                 width=400
             )
             for participant in group_participants["users"]:
+                generated_list_avatar = generator(
+                    first_name=participant["firstName"],
+                    last_name=participant["lastName"],
+                    default_color=participant["defaultProfileColor"],
+                    text_size=15,
+                    picture_width=30,
+                    picture_height=30
+                )
                 if participant["_id"] != page.client_storage.get("user_id"):
-                    friends_grid.controls.append(
-                        ft.CupertinoCheckbox(
-                            label=f"{participant["firstName"]} {participant["lastName"]}",
-                            on_change=checkbox_handler
-                        )
+                    friends_grid.controls.append((ft.Row(
+                        [
+                            generated_list_avatar,
+                            ft.CupertinoCheckbox(
+                                label=f"{participant["firstName"]} {participant["lastName"]}",
+                                on_change=checkbox_handler,
+                            )
+                        ]
+                    )
+                    )
                     )
                 else:
                     pass
@@ -154,7 +168,7 @@ def group(page: ft.Page):
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.clean()
+                page.controls.clear()
                 assignment(page)
                 page.update()
             elif assignment_dropdown.value == "Java":
@@ -172,7 +186,7 @@ def group(page: ft.Page):
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.clean()
+                page.controls.clear()
                 assignment(page)
                 page.update()
             else:
@@ -181,7 +195,7 @@ def group(page: ft.Page):
                 page.close_dialog()
                 assignment_form.open = False
                 page.update()
-                page.clean()
+                page.controls.clear()
                 assignment(page)
                 page.update()
         except FileExistsError:
@@ -269,10 +283,13 @@ def group(page: ft.Page):
         ],
     )
 
-    generated_avatar = generator(
+    generated_chat_avatar = generator(
         first_name=page.client_storage.get("user_first_name"),
         last_name=page.client_storage.get("user_last_name"),
-        default_color=page.client_storage.get("user_default_color")
+        default_color=page.client_storage.get("user_default_color"),
+        text_size=25,
+        picture_width=50,
+        picture_height=50
     )
 
     def send_click(_):
@@ -281,19 +298,8 @@ def group(page: ft.Page):
             cupertino_alert_dialog.open = True
             page.update()
         else:
-            chat.controls.append(
-                ft.Container(
-                    ft.Row([generated_avatar, ft.Text(
-                        f"{page.client_storage.get("user_first_name")}: {new_message.value}",
-                        size=20,
-                    ), ]),
-                    padding=15,
-                    border_radius=20,
-                    bgcolor=ft.colors.BLUE_GREY,
-                    expand=False,
-                    width=100,
-                )
-            )
+            send_message("course", page.client_storage.get("course_id"), new_message.value)
+
             new_message.value = ""
             page.update()
 
@@ -329,3 +335,43 @@ def group(page: ft.Page):
             width=1600
         ),
     )
+
+    while True:
+        events = socket.receive()
+        print(events)
+        if events[0] == "newMessage":
+            message = events[1]
+            chat.controls.append(
+                ft.Container(
+                    ft.Row([generated_chat_avatar, ft.Text(
+                        f"{message["sender"]["_id"]}: {message["body"]}",
+                        size=20,
+                    ), ]),
+                    padding=15,
+                    border_radius=20,
+                    bgcolor=ft.colors.BLUE_GREY,
+                    expand=False,
+                    width=100,
+                )
+            )
+        elif events[0] == "previousCourseMessages":
+            chat.controls = []
+            previousMessages = events[1]
+            print(previousMessages)
+            for message in previousMessages:
+                chat.controls.append(
+                    ft.Container(
+                        ft.Row([generated_chat_avatar, ft.Text(
+                            f"{message["sender"]["_id"]}: {message["body"]}",
+                            size=20,
+                        ), ]),
+                        padding=15,
+                        border_radius=20,
+                        bgcolor=ft.colors.BLUE_GREY,
+                        expand=False,
+                        width=100,
+                    )
+                )
+                page.update()
+        print(chat.controls)
+        page.update()
