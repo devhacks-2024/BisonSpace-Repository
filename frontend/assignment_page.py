@@ -1,14 +1,16 @@
 import flet as ft
+from sockets import socket
 
 
 def assignment(page: ft.Page):
+
+    socket.emit("join_studyRoom", page.client_storage.get("roomId"))
     page.scroll = ft.ScrollMode.ALWAYS
 
     key_words = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def',
                  'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
                  'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield', "True:",
                  "if(", ")"]
-    data = ft.Text(f"{page.client_storage.get("course_name")}")
 
     preview_column = ft.Column(
         spacing=1,
@@ -57,4 +59,14 @@ def assignment(page: ft.Page):
             code_column, preview_column, chat_column
         ],
     ))
+
+    while True:
+        events = socket.receive()
+        print(events)
+        # if events[0] == "studyRoomAssignment":
+
+        # code_column.value = events[1:][0]
+        #     pass
+        page.update()
+
 
