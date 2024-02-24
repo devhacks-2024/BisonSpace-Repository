@@ -45,6 +45,7 @@ const socketLib = {
         path: "assignment",
       });
       if (!studyRoom) return {};
+      console.log(studyRoom);
       const assignment = studyRoom.assignment;
       console.log(assignment);
       return assignment;
