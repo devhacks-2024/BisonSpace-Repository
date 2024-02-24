@@ -1,5 +1,7 @@
 import flet as ft
+from assignment_page import assignment
 import requests
+from avatar_generator import generator
 
 
 def group(page: ft.Page):
@@ -13,29 +15,31 @@ def group(page: ft.Page):
         height=700,
         expand=True
     )
-    group_participants = ["alex", "toni", "test", "alex", "toni", "test", "alex", "toni", "test", "alex", "toni",
-                          "test", "alex", "toni", "test", "alex", "toni", "test"]
+    group_participants_request = requests.get(
+        url=f"http://127.0.0.1:4000/api/courses/{page.client_storage.get("course_id")}/users",
+        headers={"authorization": f"{page.client_storage.get('token')}"}
+    )
+    group_participants = group_participants_request.json()
     selected_participants = []
-    room_type = ""
 
     def next_window_handler(_):
-        # data = {
-        #     "course": page.client_storage.get("course_name"),
-        #     "user": selected_participants,
-        #     "type": room_type,
-        # }
-        # room_request = requests.post(
-        #     url="http://127.0.0.1:4000:URL",
-        #     json=data
-        # )
-        status_code = 200
-        if status_code == 200:
+        data = {
+            "type": page.client_storage.get("room_type"),
+            "users": selected_participants,
+            "name": "some test",
+            "courseId": page.client_storage.get("course_id"),
+        }
+        room_request = requests.post(
+            url="http://127.0.0.1:4000/api/studyRoom",
+            json=data,
+            headers={"authorization": f"{page.client_storage.get('token')}"}
+        )
+        if room_request.status_code == 201:
+            page.close_dialog()
             creation_form.open = False
-            page.dialog = None
             page.update()
-
-            assignment_form.open = True
             page.dialog = assignment_form
+            assignment_form.open = True
             page.update()
 
     def checkbox_handler(_):
@@ -46,73 +50,44 @@ def group(page: ft.Page):
 
     def dropdown_handler(_):
         if _.data == "Private":
-            friends_grid = ft.GridView(
-                expand=50,
-                runs_count=50,
-                max_extent=50,
-                child_aspect_ratio=1.0,
+            friends_grid = ft.ListView(
+                expand=10,
                 spacing=10,
-                run_spacing=30,
                 width=400
             )
-            for participant in group_participants:
-                friends_grid.controls.append(
-                    ft.CupertinoCheckbox(
-                        label=participant,
-                        on_change=checkbox_handler
+            for participant in group_participants["users"]:
+                if participant["_id"] != page.client_storage.get("user_id"):
+                    friends_grid.controls.append(
+                        ft.CupertinoCheckbox(
+                            label=f"{participant["firstName"]} {participant["lastName"]}",
+                            on_change=checkbox_handler
+                        )
                     )
-                )
+                else:
+                    pass
             room_column.controls = [
-                ft.TextField(
-                    width=400,
-                    height=100,
-                    label="Room name",
-                    helper_text="Please enter your room name",
-                    bgcolor=ft.colors.BLACK45,
-                ),
-                ft.Dropdown(
-                    width=400,
-                    options=[
-                        ft.dropdown.Option("Private"),
-                        ft.dropdown.Option("Public"),
-                    ],
-                    on_change=dropdown_handler
-                ),
+                room_dropdown,
+                room_name,
                 ft.Text("Add participants", size=26),
                 friends_grid
             ]
-            room_type = "Private"
+            page.client_storage.set("room_type", "private")
             page.update()
         elif _.data == "Public":
-            room_type = "Public"
+            page.client_storage.set("room_type", "public")
             room_column.controls = [
-                ft.TextField(
-                    width=400,
-                    height=100,
-                    label="Room name",
-                    helper_text="Please enter your room name",
-                    bgcolor=ft.colors.BLACK45,
-                ),
-                ft.Dropdown(
-                    width=400,
-                    options=[
-                        ft.dropdown.Option("Private"),
-                        ft.dropdown.Option("Public"),
-                    ],
-                    on_change=dropdown_handler
-                ),
+                room_dropdown,
+                room_name,
                 ft.Text(
-                    "Type: Public"
+                    "Type: Public",
+                    size=18
                 )
             ]
             page.update()
 
     def close_dlg(e):
+        page.close_dialog()
         creation_form.open = False
-        page.update()
-
-    def close_assignment(e):
-        assignment_form.open = False
         page.update()
 
     def room_handler(_):
@@ -120,23 +95,26 @@ def group(page: ft.Page):
         creation_form.open = True
         page.update()
 
+    room_name = ft.TextField(
+        width=400,
+        height=100,
+        label="Room name",
+        helper_text="Please enter your room name",
+        bgcolor=ft.colors.BLACK45,
+    )
+    room_dropdown = ft.Dropdown(
+        width=400,
+        options=[
+            ft.dropdown.Option("Private"),
+            ft.dropdown.Option("Public"),
+        ],
+        on_change=dropdown_handler
+    )
+
     room_column = ft.Column(
         controls=[
-            ft.TextField(
-                width=400,
-                height=100,
-                label="Room name",
-                helper_text="Please enter your room name",
-                bgcolor=ft.colors.BLACK45,
-            ),
-            ft.Dropdown(
-                width=400,
-                options=[
-                    ft.dropdown.Option("Private"),
-                    ft.dropdown.Option("Public"),
-                ],
-                on_change=dropdown_handler
-            )
+            room_dropdown,
+            room_name
         ],
         height=500,
         width=500,
@@ -169,34 +147,50 @@ def group(page: ft.Page):
     )
 
     def assignment_button_handler(_):
-        if assignment_name.value == "" or assignment_description.value == "":
+        try:
+            if assignment_dropdown.value == "Python":
+                fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.py', 'x')
+                fp.close()
+                page.close_dialog()
+                assignment_form.open = False
+                page.update()
+                page.clean()
+                assignment(page)
+                page.update()
+            elif assignment_dropdown.value == "Java":
+                fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.java', 'x')
+                fp.close()
+                page.close_dialog()
+                assignment_form.open = False
+                page.update()
+                page.controls.clear()
+                assignment(page)
+                page.update()
+            elif assignment_dropdown.value == "Plain text":
+                fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.txt', 'x')
+                fp.close()
+                page.close_dialog()
+                assignment_form.open = False
+                page.update()
+                page.clean()
+                assignment(page)
+                page.update()
+            else:
+                fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.txt', 'x')
+                fp.close()
+                page.close_dialog()
+                assignment_form.open = False
+                page.update()
+                page.clean()
+                assignment(page)
+                page.update()
+        except FileExistsError:
             page.dialog = cupertino_alert_dialog
             cupertino_alert_dialog.open = True
             page.update()
-        else:
-            try:
-                if assignment_dropdown.value == "Python":
-                    fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.py', 'x')
-                    fp.close()
-                    print("Python is created")
-                elif assignment_dropdown.value == "Java":
-                    fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.java', 'x')
-                    fp.close()
-                    print("Java is created")
-                elif assignment_dropdown.value == "Plain text":
-                    fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.txt', 'x')
-                    fp.close()
-                    print("txt is created")
-                else:
-                    fp = open(f'frontend/assignments/{str(assignment_name.value).replace(" ", "")}.txt', 'x')
-                    fp.close()
-                    print("txt is created")
-            except FileExistsError:
-                page.dialog = cupertino_alert_dialog
-                cupertino_alert_dialog.open = True
-                page.update()
 
     def remove_dialog(_):
+        page.close_dialog()
         cupertino_alert_dialog.open = False
         page.update()
 
@@ -214,17 +208,6 @@ def group(page: ft.Page):
                 on_click=remove_dialog
             ),
         ]
-    )
-
-    assignment_button = ft.ElevatedButton(
-        width=240,
-        height=40,
-        icon=ft.icons.HISTORY,
-        text="Create assignment",
-        style=ft.ButtonStyle(
-            bgcolor=ft.colors.BLACK45,
-        ),
-        on_click=assignment_button_handler
     )
 
     assignment_column = ft.Column(
@@ -251,11 +234,10 @@ def group(page: ft.Page):
         on_dismiss=lambda e: print("Modal dialog dismissed!"),
         modal=True,
         actions=[
-            assignment_button,
-            ft.TextButton("Cancel", on_click=close_assignment),
+            ft.TextButton("Submit", on_click=assignment_button_handler),
+            ft.TextButton("Cancel", on_click=close_dlg),
         ],
-        actions_alignment=ft.MainAxisAlignment.END,
-        title=ft.Text("Study room creation"),
+        title=ft.Text("Assignment form"),
         content=assignment_column
     ))
 
@@ -287,6 +269,12 @@ def group(page: ft.Page):
         ],
     )
 
+    generated_avatar = generator(
+        first_name=page.client_storage.get("user_first_name"),
+        last_name=page.client_storage.get("user_last_name"),
+        default_color=page.client_storage.get("user_default_color")
+    )
+
     def send_click(_):
         if new_message.value == "" or new_message.value == " ":
             page.dialog = cupertino_alert_dialog
@@ -295,10 +283,10 @@ def group(page: ft.Page):
         else:
             chat.controls.append(
                 ft.Container(
-                    ft.Text(
-                        f"/FIRST_NAME/: {new_message.value}",
+                    ft.Row([generated_avatar, ft.Text(
+                        f"{page.client_storage.get("user_first_name")}: {new_message.value}",
                         size=20,
-                    ),
+                    ), ]),
                     padding=15,
                     border_radius=20,
                     bgcolor=ft.colors.BLUE_GREY,
