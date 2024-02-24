@@ -20,7 +20,7 @@ const courseHandler = {
 
       const course = await Course.findById(courseId).populate({
         path: "users",
-        select: "_id firstName lastName",
+        select: "_id firstName lastName defaultProfileColor",
       });
       if (!course)
         return res
