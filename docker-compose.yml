@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/docker/Dockerfile
+    container_name: backend_bisons_space
+    command: npm start
+    ports:
+      - "4000:4000"
